@@ -1,6 +1,7 @@
 {% extends 'baseHTML.html' %}
 
 {% load static %}
+{% load crispy_forms_tags %}
 
 
 {% block stylesheet %}
@@ -16,12 +17,12 @@
 
     <!-- Icon -->
     <div class="fadeIn first">
-      실시간 검색
+      <h4 class="h4">실시간 검색</h4>
     </div>
 
-    <form>
-      <input type="text" id="login" class="fadeIn second" name="login" placeholder="상호명">
-      <input type="text" id="password" class="fadeIn third" name="login" placeholder="검색어">
+    <form method="post" id="start_search_form">
+        {{ form.company_name }}
+        {{ form.keywords }}
       <input type="submit" class="fadeIn fourth" value="Search">
     </form>
 

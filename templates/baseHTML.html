@@ -1,0 +1,190 @@
+{% load staticfiles %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="./../">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="스마트스토어 순위 확인">
+    <meta name="author" content="이승우">
+    <meta name="keyword" content="스마트스토어,웹크롤링,순위">
+    <title>스마트스토어 순위 확인</title>
+    <!-- Icons-->
+    <link href="{% static 'css/coreui-icons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/flag-icon.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/simple-line-icons/css/simple-line-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'css/fontawesome/css/all.css' %}" rel="stylesheet">
+    <!-- Main styles for this application-->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/select2/css/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/jquery/dist/jquery.min.js' %}"></script>
+    {% block stylesheet %}{% endblock %}
+    <!-- DataTables -->
+    <link href="{% static 'DataTables/datatables.min.css' %}" rel="stylesheet">
+</head>
+
+<body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+<header class="app-header navbar">
+    <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="{% url 'index' %}">
+        로고
+        {#        <img class="navbar-brand-full img-fluid" src="{% static 'img/kcfeedLogoNew.gif' %}">#}
+    </a>
+    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <ul class="nav navbar-nav d-md-down-none">
+    </ul>
+    <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+            <a class="nav-link nav-link pr-2" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+               aria-expanded="false">
+                {% if user.is_authenticated %}
+                    {% with 'img/employee/'|add:user.username|add:'.jpg' as image_static %}
+                        <img class="img-avatar" src="{% static  image_static %} " alt=" ">
+                    {% endwith %}
+                    <span>{{ user.username }}</span>
+                {% else %}
+                    <span>로그인필요</span>
+                {% endif %}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-header text-center">
+                    <strong>Account</strong>
+                </div>
+                <a class="dropdown-item" href="{% url 'password_change' %}">
+                    <i class="fa fa-user"></i> Profile</a>
+                <a class="dropdown-item" href="{% url 'logout' %}">
+                    <i class="fa fa-lock"></i> Logout</a>
+            </div>
+        </li>
+    </ul>
+</header>
+<div class="app-body">
+    <div class="sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav">
+                <li class="nav-title">생산등록</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        {#                    <a class="nav-link" href="{% url 'productRegister' %}">#}
+                        <i class="nav-icon icon-pencil"></i>제품생산등록</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        {#                    <a class="nav-link" href="{% url 'productList' %}">#}
+                        <i class="nav-icon icon-pencil"></i>생산내역조회</a>
+                </li>
+                {#                <li class="nav-title">주문발주</li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'orderReg' %}">#}
+                {#                        <i class="nav-icon icon-star"></i>주문등록</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'orderList' %}">#}
+                {#                        <i class="nav-icon icon-star"></i>주문조회</a>#}
+                {#                </li>#}
+                {#                <li class="nav-title">출고</li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'releaseReg' %}">#}
+                {#                        <i class="nav-icon icon-star"></i>출고등록</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'releaseList' %}">#}
+                {#                        <i class="nav-icon icon-star"></i>출고조회</a>#}
+                {#                </li>#}
+                {#                <li class="nav-title">원란</li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'eggsReg' %}">#}
+                {#                        <i class="nav-icon icon-bell"></i>원란등록</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'eggsList' %}">#}
+                {#                        <i class="nav-icon icon-bell"></i>원란조회</a>#}
+                {#                </li>#}
+                {#                <li class="nav-title">포장재</li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'packingReg' %}">#}
+                {#                        <i class="nav-icon icon-energy"></i>포장재등록</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'packingList' %}">#}
+                {#                        <i class="nav-icon icon-energy"></i>포장재조회</a>#}
+                {#                </li>#}
+                {#                <li class="nav-title">OEM 상품</li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'productOEMReg' %}">#}
+                {#                        <i class="nav-icon icon-list"></i>OEM 등록</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'productOEMList' %}">#}
+                {#                        <i class="nav-icon icon-list"></i>OEM 조회</a>#}
+                {#                </li>#}
+                {#                <li class="nav-title">코드관리</li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'locationReg' %}">#}
+                {#                        <i class="nav-icon icon-calculator"></i>거래처 등록</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'locationList' %}">#}
+                {#                        <i class="nav-icon icon-calculator"></i>거래처 조회</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'productUnitPricesList' %}">#}
+                {#                        <i class="nav-icon icon-calculator"></i>거래처별 제품단가</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'setProductMatchList' %}">#}
+                {#                        <i class="nav-icon icon-calculator"></i>세트상품관리</a>#}
+                {#                </li>#}
+                {#                <li class="nav-item">#}
+                {#                    <a class="nav-link" href="{% url 'autoPackingList' %}">#}
+                {#                        <i class="nav-icon icon-calculator"></i>포장재자동출고</a>#}
+                {#                </li>#}
+            </ul>
+        </nav>
+        <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+    </div>
+
+    <main class="main">
+        <!-- Breadcrumb-->
+        <ol class="breadcrumb">
+        </ol>
+
+        <div class="container-fluid">
+            <div class="animated fadeIn">
+
+                {% block content %}
+
+                {% endblock %}
+    </main>
+</div>
+<footer class="app-footer">
+    <div>
+        {#        <a href="http://gw.kcfeed.co.kr">KCFEED</a>#}
+        <span>&copy; created by 이승우</span>
+    </div>
+    <div class="ml-auto">
+        {#        <a href="http://kcfeed.co.kr">KCFEED</a>#}
+    </div>
+</footer>
+
+<!-- Bootstrap and necessary plugins-->
+<script src="{% static 'popper.js/dist/umd/popper.min.js' %}"></script>
+<script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static '@coreui/coreui-pro/dist/js/coreui.min.js' %}"></script>
+
+<!-- Datatable -->
+<!-- 전역 javascript-->
+<script src="{% static 'js/base.js' %}"></script>
+<script src="{% static 'chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script src="{% static 'chart.js/dist/Chart.js' %}"></script>
+
+{% block js %}{% endblock %}
+
+</body>
+</html>

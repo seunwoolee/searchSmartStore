@@ -1,0 +1,23 @@
+{% load widget_tweaks %}
+{% load mathfilters %}
+
+      <table style="width : 100%">
+          <tr>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>공급가</label>
+                        {% render_field productOEMForm.purchaseSupplyPrice  class="form-control purchaseSupplyPrice" id="modify_id_purchaseSupplyPrice"%}
+                  </div>
+              </td>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>부가세</label>
+                        {% render_field productOEMForm.purchaseVat class="form-control purchaseVat" id="modify_id_purchaseVat"%}
+                  </div>
+              </td>
+          </tr>
+      </table>
+      <div class="form-group">
+          <label><i class="nav-icon icon-note"></i>메모</label>
+            {% render_field productOEMForm.memo class="form-control" id="modify_id_memo"%}
+      </div>

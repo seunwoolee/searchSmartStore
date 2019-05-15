@@ -1,0 +1,5 @@
+@media only screen and (max-width: 450px) {
+   #result > tbody > tr > td:nth-child(2) > span > span.selection > span{ max-width : 140px; }
+}
+
+

@@ -1,0 +1,16 @@
+.table th, .table td {
+    padding : 0.2rem, 0.3rem, 0.2rem, 0.3rem;
+}
+
+.nav-fill .nav-link.active{
+    border-top : 2px solid #4caf50;
+}
+
+.datatable .badge{
+    font-size: 100% !important;
+}
+
+#managerFilter .select2{
+    width : 100px !important;
+}
+

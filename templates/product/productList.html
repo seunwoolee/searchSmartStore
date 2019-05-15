@@ -1,0 +1,299 @@
+﻿{% extends 'baseHTML.html' %}
+
+{% load static %}
+
+
+{% block stylesheet %}
+<link href="{% static 'css/productList.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-lg-12 col-sm-12">
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-edit"></i> 생산등록
+                <div class="card-header-actions">
+                    <a id="productReport" class="card-header-action" >
+                        <small class="text-muted">생산일보출력</small>
+                    </a>
+                </div>
+            </div>
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="badge badge-danger" id="openEggPercent"></span>
+                        <span class="badge badge-dark" id="productPercent"></span>
+                        <span class="badge badge-success" id="lossTotal"></span>
+                        <span class="badge badge-secondary" id="insertLoss"></span>
+                        <span class="badge badge-warning" id="openEggLoss"></span>
+                    </div>
+                    <!--생산구분 checkbox 시작-->
+                    <div class="type_filter pt-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="할란" value="할란">
+                            <label class="form-check-label" for="할란"><span class="badge badge-danger">할란</span></label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="할란사용" value="할란사용">
+                            <label class="form-check-label" for="할란사용"><span
+                                    class="badge badge-warning">할란사용</span></label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="공정품투입" value="공정품투입">
+                            <label class="form-check-label" for="공정품투입"><span
+                                    class="badge badge-success">공정품투입</span></label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="공정품발생" value="공정품발생">
+                            <label class="form-check-label" for="공정품발생"><span
+                                    class="badge badge-primary">공정품발생</span></label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="미출고품사용" value="미출고품사용">
+                            <label class="form-check-label" for="미출고품사용"><span
+                                    class="badge badge-secondary">미출고품사용</span></label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="미출고품투입" value="미출고품투입">
+                            <label class="form-check-label" for="미출고품투입"><span
+                                    class="badge badge-info">미출고품투입</span></label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="제품생산" value="제품생산">
+                            <label class="form-check-label" for="제품생산"><span
+                                    class="badge badge-dark">제품생산</span></label>
+                        </div>
+                    </div>
+                    <!--생산구분 checkbox 끝-->
+                    <div class="input-daterange form-row">
+                        <div class="col-lg-5 input-group mb-2 mr-sm-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+                            </div>
+                            <input type="date" name="start_date" id="start_date" class="form-control"/>
+                        </div>
+                        <div class="col-lg-5 input-group mb-2 mr-sm-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+                            </div>
+                            <input name="end_date" type="date" class="form-control" id="end_date">
+                        </div>
+                        <div class="col-lg-1">
+                            <input type="button" name="search" id="search" value="Search"
+                                   class="btn btn-info float-right"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-striped table-bordered datatable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>생산구분</th>
+                        <th>제품코드</th>
+                        <th>제품명</th>
+                        <th>생산일</th>
+                        <th>생산량</th>
+                        <th>생산수량</th>
+                        <th>RAWTANK</th>
+                        <th>PASTTANK</th>
+                        <th>투입로스량</th>
+                        <th>할란로스량</th>
+                        <th>살균로스량</th>
+                        <th>충진로스량</th>
+                        <th>메모</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tfoot>
+                    <tr>
+                        <!--<th colspan="6" style="text-align:center">합계</th>-->
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <!--<th colspan="2"></th>-->
+                    </tr>
+                    </tfoot>
+
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Product EDIT Modal -->
+<div class="modal fade everyModal" id="productModal" role="dialog">
+    <div class="modal-dialog modal-primary">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title codeName"></h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <!--{% csrf_token %}-->
+                    <table style="width : 100%">
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <label><i class="nav-icon icon-drop"></i>양(KG)</label>
+                                    <input type="number" class="form-control amount" id="amount" name="amount"
+                                           placeholder="생산량을 입력하세요" required="true" min="0" step="any">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label><i class="nav-icon icon-drop"></i>수량(EA)</label>
+                                    <input type="number" class="form-control count" id="count" name="count"
+                                           placeholder="생산수량을 입력하세요" required="true" min="0">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="form-group">
+                        <label><i class="nav-icon icon-note"></i>메모</label>
+                        <input type="text" class="form-control memo" name="memo"
+                               placeholder="메모를 입력하세요">
+                    </div>
+                    <input type="hidden" class="ajaxUrlType" name="ajaxUrlType" value="patch"/>
+                    <input type="hidden" class="productType" name="productType" value="">
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 미출고품 Modal -->
+<div class="modal fade everyModal" id="releaseRecallModal" role="dialog">
+    <div class="modal-dialog modal-success">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title codeName"></h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <!--{% csrf_token %}-->
+                    <div class="form-group">
+                        <label><i class="nav-icon icon-drop"></i>재투입 일자</label>
+                        <input type="hidden" name="ymd" maxlength="8" required="True" id="id_ymd_recall"
+                               class="form-control ymd">
+                        <input type="date" name="fakeYmd" required="True" id="id_fakeYmd_recall"
+                               class="form-control fakeYmd">
+                    </div>
+                    <table style="width : 100%">
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <label><i class="nav-icon icon-drop"></i>양(KG)</label>
+                                    <input type="number" class="form-control amount" name="amount" id="id_amount_recall"
+                                           placeholder="생산량을 입력하세요" required="true" step="any">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label><i class="nav-icon icon-drop"></i>수량(EA)</label>
+                                    <input type="number" class="form-control count" name="count" id="id_count_recall"
+                                           placeholder="생산수량을 입력하세요" required="true">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="form-group">
+                        <label><i class="nav-icon icon-note"></i>메모</label>
+                        <input type="text" class="form-control memo" name="memo"
+                               placeholder="메모를 입력하세요">
+                    </div>
+                    <input type="hidden" class="ajaxUrlType" name="ajaxUrlType" value="post"/>
+                    <input type="hidden" name="productType" value="recall">
+                    <button type="submit" class="btn btn-success">OK</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ProductEgg EDIT Modal -->
+<div class="modal fade everyModal" id="productEggModal" role="dialog">
+    <div class="modal-dialog modal-primary">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title codeName"></h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <!--{% csrf_token %}-->
+                    <div class="form-group">
+                        <label for="tank_amount"><i class="nav-icon icon-note"></i>Tank량</label>
+                        <input type="number" class="form-control" id="tank_amount" name="tank_amount"
+                               placeholder="Tank량 입력" required="true" step="any">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="nav-icon icon-note"></i>메모</label>
+                        <input type="text" class="form-control memo" name="memo"
+                               placeholder="메모를 입력하세요">
+                    </div>
+                    <input type="hidden" class="ajaxUrlType" name="ajaxUrlType" value="patch"/>
+                    <input type="hidden" class="productType" name="productType" value="">
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Product Delete Modal -->
+<div class="modal fade everyModal" role="dialog" id="confirm">
+    <div class="modal-dialog modal-danger">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">데이터를 삭제 하시겠습니까?</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <!--{% csrf_token %}-->
+                    <!--<input type="hidden" class="delete_state" name="delete_state" value="Y">-->
+                    <input type="hidden" class="ajaxUrlType" name="ajaxUrlType" value="delete"/>
+                    <input type="hidden" class="productType" name="productType" value="">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/index.js' %}"></script>
+<script src="{% static 'js/productList.js' %}"></script>
+{% endblock %}

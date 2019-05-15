@@ -1,0 +1,304 @@
+{% load humanize %}
+{% load mathfilters %}
+{% load custom %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>생산 일지</title>
+
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #FAFAFA;
+	font: 9pt "Tahoma";
+}
+
+* {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+.page {
+	width: 21cm;
+	min-height: 29.7cm;
+	padding: 0.5cm;
+	margin: 1cm auto;
+	border: 1px #D3D3D3 solid;
+	border-radius: 5px;
+	background: white;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.subpage {
+	padding: 1cm;
+	border: 2px black solid;
+	height: 280mm;
+	outline: 1cm white solid;
+}
+
+@page {
+	size: A4;
+	margin: 0;
+}
+@media print {
+	.page {
+		margin: 0;
+		border: initial;
+		border-radius: initial;
+		width: initial;
+		min-height: initial;
+		box-shadow: initial;
+		background: initial;
+		page-break-after: always;
+	}
+}
+	
+table {
+  border-collapse: collapse;
+
+}
+
+td, th {
+  white-space: nowrap;
+  border: 1px solid #000000;
+  text-align: center;
+  padding: 2px;
+}
+
+#approvalTable
+{
+	float : right;
+	width: 300px;
+	margin-top : 10px;
+}
+
+.mainTable
+{
+	width : 100%;
+}
+
+.sum
+{
+	background-color : #feffd0;
+	font-weight : 800;
+}
+
+.blue
+{
+	color : blue;
+}
+
+.number
+{
+    text-align : right !important;
+}
+
+.summary
+{
+    padding-top : 5px;
+    font-weight : 800;
+}
+</style>
+
+</head>
+
+
+
+<body>
+
+<div class="page">
+
+<div class="subpage">
+	<div>
+	<h1 style="text-align : center; margin-bottom : 0px;">생산 일지</h1>
+	<div style="text-align : center;"><span>생산일 : {{ start_date }} ~ {{ end_date }}</span></div>
+
+	<table id="approvalTable" style="">
+	<tr>
+		<th rowspan="2">결재</th>
+		<th>작성</th>
+		<th>검토</th>
+		<th>검토</th>
+		<th>승인</th>
+	</tr>
+	<tr>
+		<td style="width : 80px; height : 50px;"><br><br></td>
+		<td style="width : 80px; height : 50px;"><br></td>
+		<td style="width : 80px; height : 50px;"><br></td>
+		<td style="width : 80px; height : 50px;"><br></td>
+	</tr>
+	</table>
+	</div>
+
+
+	<div style="clear : both;"></div>
+
+	<div>
+		<div class="summary">
+             할란수율 : <span>{{percentSummary.openEggPercent}}%</span>
+             제품수율 : <span>{{percentSummary.productPercent}}%</span>
+             로스합   : <span>{{percentSummary.lossTotal}}kg</span>
+             투입LOSS : <span>{{percentSummary.insertLoss}}%</span>
+             할란LOSS : <span>{{percentSummary.openEggLoss}}%</span>
+        </div>
+
+		<table class="mainTable">
+		  <tr style="height:50px; background-color:#dcf0ff;">
+			<th style="width : 15%">구분</th>
+			<th style="width : 30%">제품명</th>
+            <th>투입수량</th>
+            <th>투입중량</th>
+            <th>RAWTANK</th>
+            <th>PASTTANK</th>
+			<th style="width : 10%">생산량</th>
+		  </tr>
+
+          {% if result_list %}
+			{% for ele in result_list %}
+                    {% if "합계" in ele.report_sort_type %}
+                     {% if ele.code != "pass" %}
+                      <tr>
+                        <td class="sum"> </td>
+                        <td class="sum">{{ele.codeName}}</td>
+                        <td class="sum">{{ele.report_egg_count|intcomma }}</td>
+                        <td class="sum">{{ele.report_egg_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_rawTank_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_pastTank_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_product_amount|intcomma }}</td>
+                      </tr>
+                     {% endif %}
+                    {% else %}
+                      <tr>
+                        <td>{{ele.report_sort_type}}</td>
+                        <td class="blue">{{ele.codeName}}</td>
+                        <td class="number">{{ele.report_egg_count|intcomma }}</td>
+                        <td class="number">{{ele.report_egg_amount|intcomma }}</td>
+                        {% if ele.report_rawTank_amount %}
+                            <td class="number">{{ele.report_rawTank_amount|intcomma }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
+                        {% if ele.report_pastTank_amount %}
+                            <td class="number">{{ele.report_pastTank_amount|intcomma }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
+                        <td class="number">{{ele.report_product_amount|intcomma }}</td>
+                      </tr>
+                    {% endif %}
+			{% endfor %}
+          {% endif %}
+
+
+        {% if first_loop_reuslt %}
+            {% for ele in first_loop_reuslt %}
+                    {% if "합계" in ele.report_sort_type %}
+                     {% if ele.code != "pass" %}
+                      <tr>
+                        <td class="sum"> </td>
+                        <td class="sum">{{ele.codeName}}</td>
+                        <td class="sum">{{ele.report_egg_count|intcomma }}</td>
+                        <td class="sum">{{ele.report_egg_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_rawTank_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_pastTank_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_product_amount|intcomma }}</td>
+                      </tr>
+                     {% endif %}
+                    {% else %}
+                      <tr>
+                        <td>{{ele.report_sort_type}}</td>
+                        <td class="blue">{{ele.codeName}}</td>
+                        <td class="number">{{ele.report_egg_count|intcomma }}</td>
+                        <td class="number">{{ele.report_egg_amount|intcomma }}</td>
+                        {% if ele.report_rawTank_amount %}
+                            <td class="number">{{ele.report_rawTank_amount|intcomma }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
+                        {% if ele.report_pastTank_amount %}
+                            <td class="number">{{ele.report_pastTank_amount|intcomma }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
+                        <td class="number">{{ele.report_product_amount|intcomma }}</td>
+                      </tr>
+                    {% endif %}
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+    </div>
+
+    <div class="page">
+        <div class="subpage">
+            <table class="mainTable">
+              <tr style="height:50px; background-color:#dcf0ff;">
+                <th style="width : 15%">구분</th>
+                <th style="width : 30%">제품명</th>
+                <th>투입수량</th>
+                <th>투입중량</th>
+                <th>RAWTANK</th>
+                <th>PASTTANK</th>
+                <th style="width : 10%">생산량</th>
+              </tr>
+            {% for ele in loop_reuslt %}
+                {% if forloop.counter|mod:45 == 0%}
+                            </table>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="page">
+                        <div class="subpage">
+                            <table class="mainTable">
+                              <tr style="height:50px; background-color:#dcf0ff;">
+                                <th style="width : 15%">구분</th>
+                                <th style="width : 30%">제품명</th>
+                                <th>투입수량</th>
+                                <th>투입중량</th>
+                                <th>RAWTANK</th>
+                                <th>PASTTANK</th>
+                                <th style="width : 10%">생산량</th>
+                              </tr>
+                {% else %}
+                   {% if "합계" in ele.report_sort_type %}
+                     {% if ele.code != "pass" %}
+                      <tr>
+                        <td class="sum"> </td>
+                        <td class="sum">{{ele.codeName}}</td>
+                        <td class="sum">{{ele.report_egg_count|intcomma }}</td>
+                        <td class="sum">{{ele.report_egg_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_rawTank_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_pastTank_amount|intcomma }}</td>
+                        <td class="sum">{{ele.report_product_amount|intcomma }}</td>
+                      </tr>
+                     {% endif %}
+                   {% else %}
+                      <tr>
+                        <td>{{ele.report_sort_type}}</td>
+                        <td class="blue">{{ele.codeName}}</td>
+                        <td class="number">{{ele.report_egg_count|intcomma }}</td>
+                        <td class="number">{{ele.report_egg_amount|intcomma }}</td>
+                        {% if ele.report_rawTank_amount %}
+                            <td class="number">{{ele.report_rawTank_amount|intcomma }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
+                        {% if ele.report_pastTank_amount %}
+                            <td class="number">{{ele.report_pastTank_amount|intcomma }}</td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
+                        <td class="number">{{ele.report_product_amount|intcomma }}</td>
+                      </tr>
+                   {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+		</table>
+	</div>
+</div>
+</div>
+
+
+</body>
+</html>

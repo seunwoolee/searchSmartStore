@@ -1,0 +1,60 @@
+{% load widget_tweaks %}
+
+      <table style="width : 100%">
+          <tr>
+              <td style="width : 50%">
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>타입</label>
+                        {% render_field form.type class="form-control type " %}
+                  </div>
+              </td>
+              <td style="width : 50%">
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>특인</label>
+                        {% render_field form.specialTag class="form-control specialTag " %}
+                  </div>
+              </td>
+          </tr>
+      </table>
+      <table style="width : 100%">
+          <tr>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>주문일</label>
+                        {% render_field form.ymd class="form-control ymd" required="True" %}
+                        {% render_field form.fakeYmd class="form-control fakeYmd" required="True" %}
+                  </div>
+              </td>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>단가</label>
+                        {% render_field form.price class="form-control price" required="True" %}
+                  </div>
+              </td>
+          </tr>
+      </table>
+
+      <table style="width : 100%">
+          <tr>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>양(KG)</label>
+                        {% render_field form.amount class="form-control amount" required="True" %}
+                  </div>
+              </td>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>수량(EA)</label>
+                        {% render_field form.count  class="form-control count" required="True" %}
+                  </div>
+              </td>
+          </tr>
+      </table>
+      <div class="form-group">
+          <label><i class="nav-icon icon-note"></i>메모</label>
+            {% render_field form.memo class="form-control" %}
+      </div>
+
+
+
+

@@ -1,0 +1,28 @@
+{% load widget_tweaks %}
+
+<table style="width : 100%">
+    <tr>
+        <div class="form-group">
+            <label><i class="nav-icon icon-drop"></i>제품</label>
+            {% render_field productUnitPricesForm.product class="form-control product" style="width : 100%" %}
+        </div>
+    </tr>
+    <tr>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>단가</label>
+                {% render_field productUnitPricesForm.price class="form-control price" %}
+            </div>
+        </td>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>개수</label>
+                {% render_field productUnitPricesForm.count class="form-control count" %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+
+

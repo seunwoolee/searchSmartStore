@@ -1,0 +1,58 @@
+{% load widget_tweaks %}
+
+<table style="width : 100%">
+    <tr>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>거래처명</label>
+                {% render_field form.codeName class="form-control" %}
+            </div>
+        </td>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>대표자명</label>
+                {% render_field form.location_owner class="form-control" %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table style="width : 100%">
+    <tr>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>주소</label>
+                {% render_field form.location_address class="form-control" %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table style="width : 100%">
+    <tr>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>사업자번호</label>
+                {% render_field form.location_companyNumber class="form-control" %}
+            </div>
+        </td>
+        <td>
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>전화번호</label>
+                {% render_field form.location_phone class="form-control" %}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div class="form-group">
+                <label><i class="nav-icon icon-drop"></i>담당자</label>
+                {% render_field form.location_manager class="form-control" %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+
+

@@ -1,0 +1,288 @@
+﻿{% extends 'baseHTML.html' %}
+
+{% load static %}
+
+
+{% block stylesheet %}
+<link href="{% static 'css/orderList.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-edit"></i> 주문조회
+                <div class="card-header-actions">
+                    <a class="card-header-action" href="https://datatables.net" target="_blank">
+                        <small class="text-muted"></small>
+                    </a>
+                </div>
+            </div>
+            <div class="card-header">
+                <div class="row type_filter">
+                    <div class="col-md-5">
+                        <!--필터 시작-->
+                        <div class="form-check form-check-inline" id="locationFilter" data-toggle="tooltip" data-original-title="장소">
+                            <div class="input-group mb-2 mr-sm-2 ">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="far fa-building"></i></div>
+                                </div>
+                                {{ form.location }}
+                            </div>
+                        </div>
+                        <div class="form-check form-check-inline" id="managerFilter" data-toggle="tooltip" data-original-title="담당자">
+                            <div class="input-group mb-2 mr-sm-2 ">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fas fa-user"></i></div>
+                                </div>
+                                {{ form.location_manager }}
+                            </div>
+                        </div>
+                        <div class="form-check form-check-inline" id="moneyMarkFilter">
+                            <input class="form-check-input" type="checkbox" id="moneyMark">
+                            <label class="form-check-label" for="moneyMark"><span
+                                    class="badge badge-warning">거래명세표 금액표기</span></label>
+                        </div>
+                        <!--필터 끝-->
+                    </div>
+
+                    <div class="col-md-7">
+                        <!--장소타입 checkbox 시작-->
+                        <div class="form-row" id="locationType">
+                            <div class="form-group col-md-4" id="characterFilter">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="B2B" value="01">
+                                    <label class="form-check-label" for="B2B"><span
+                                            class="badge badge-danger">B2B</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="급식" value="02">
+                                    <label class="form-check-label" for="급식"><span
+                                            class="badge badge-warning">급식</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="미군납" value="03">
+                                    <label class="form-check-label" for="미군납"><span
+                                            class="badge badge-success">미군납</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="백화점" value="04">
+                                    <label class="form-check-label" for="백화점"><span
+                                            class="badge badge-primary">백화점</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="온라인" value="05">
+                                    <label class="form-check-label" for="온라인"><span
+                                            class="badge badge-dark">온라인</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="자사몰" value="06">
+                                    <label class="form-check-label" for="자사몰"><span
+                                            class="badge badge-danger">자사몰</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="직거래" value="07">
+                                    <label class="form-check-label" for="직거래"><span
+                                            class="badge badge-warning">직거래</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="특판" value="08">
+                                    <label class="form-check-label" for="특판"><span
+                                            class="badge badge-success">특판</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="하이퍼" value="09">
+                                    <label class="form-check-label" for="하이퍼"><span
+                                            class="badge badge-primary">하이퍼</span></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="기타" value="99">
+                                    <label class="form-check-label" for="기타"><span
+                                            class="badge badge-dark">기타</span></label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <div class="input-daterange  form-row">
+                                    <div class="col-lg-4 input-group mb-2 mr-sm-2">
+                                        <div class="input-group-prepend ">
+                                            <div class="input-group-text"><i class="far fa-calendar-alt"></i>
+                                            </div>
+                                        </div>
+                                        <input type="date" name="start_date" id="start_date"
+                                               class="form-control" onchange="autoSetEndDate(event)" />
+                                    </div>
+                                    <div class="col-lg-4 input-group mb-2 mr-sm-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="far fa-calendar-alt"></i>
+                                            </div>
+                                        </div>
+                                        <input name="end_date" type="date" class="form-control"
+                                               id="end_date" />
+                                    </div>
+                                    <div class="col">
+                                        <input type="button" name="search" id="search" value="Search"
+                                               class="btn btn-info"/>
+                                        <input type="button" name="search" id="locationManagerSearch"
+                                               value="담당자검색"
+                                               class="btn btn-success"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs nav-fill" role="tablist" id="tabnavigator">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#stepOne" role="tab" aria-controls="stepOne">주문내역조회</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#stepTwo" role="tab" aria-controls="stepTwo">주문/출고 실적 비교</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active animated fadeIn " id="stepOne" role="tabpanel">
+                        <table class="table table-striped table-bordered datatable ">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>구분</th>
+                                <th>특인</th>
+                                <th>주문일</th>
+                                <th>요일</th>
+                                <th>거래처명</th>
+                                <th>품명</th>
+                                <th>발주량(kg)</th>
+                                <th>발주량(EA)</th>
+                                <th>단가</th>
+                                <th>금액</th>
+                                <th>메모</th>
+                                <th>세트명</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
+
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div><!-- tab-pane stepOne 끝 -->
+                    <div class="tab-pane  animated fadeIn" id="stepTwo" role="tabpanel">
+                        <table class="table table-striped table-bordered datatable">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>구분</th>
+                                <th>특인</th>
+                                <th>주문일</th>
+                                <th>거래처명</th>
+                                <th>제품명</th>
+                                <th>주문량</th>
+                                <th>주문수량</th>
+                                <th>주문금액</th>
+                                <th>출고일</th>
+                                <th>판매량</th>
+                                <th>판매수량</th>
+                                <th>판매금액</th>
+                            </tr>
+                            </thead>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
+
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div><!-- tab-pane stepTwo 끝 -->
+                </div><!-- tab-content 끝 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order EDIT Modal -->
+<div class="modal fade everyModal" id="orderModal" role="dialog">
+    <div class="modal-dialog modal-primary">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title codeName"></h4>
+            </div>
+            <div class="modal-body">
+                <!--<h5 class="mb-4 "></h5>-->
+                <form role="form">
+                    {% include 'includes/modal/orderModifyForm.html' %}
+                    <input type="hidden" class="ajaxUrlType" name="ajaxUrlType" value="patch"/>
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Order Delete Modal -->
+<div class="modal fade everyModal" role="dialog" id="confirm">
+    <div class="modal-dialog  modal-danger">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">데이터를 삭제 하시겠습니까?</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <!--{% csrf_token %}-->
+                    <input type="hidden" class="ajaxUrlType" name="ajaxUrlType" value="delete"/>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/index.js' %}"></script>
+<script src="{% static 'js/orderList.js' %}"></script>
+{{ form.media.js }}
+{% endblock %}

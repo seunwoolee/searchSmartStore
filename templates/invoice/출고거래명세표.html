@@ -1,0 +1,469 @@
+{% load humanize %}
+{% load custom %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv=Content-Type content="text/html;charset=utf-8">
+
+    <!--TODO 서버 이전후 폰트 절대경로 변경! -->
+    <!--src: url("C:\malgun.ttf");-->
+    <!--src: url("/home/kcfeed/subul/templates/invoice/malgun.ttf");-->
+
+<style type="text/css">
+@font-face {
+    font-family: malgun;
+    src: url("/home/kcfeed/subul/templates/invoice/malgun.ttf");
+}
+
+* {
+    font-family: malgun;
+    font-size:11px;
+}
+
+
+.top .header .title{
+	font-size:30px;
+	text-align: center;
+}
+
+
+.table-sheet thead {
+	border-bottom: 1px solid #2258fb;
+}
+
+.vertical-text  { writing-mode: tb-rl; }
+.blue {
+        color : #2258fb;
+}
+
+td
+{
+    padding-top : 2px;
+    padding-right : 2px;
+    padding-left : 2px;
+    padding-bottom : 0px;
+    font-weight : 600;
+}
+
+th
+{
+    padding : 1px;
+    font-weight : 600;
+}
+
+.text-right
+{
+    text-align: right;
+}
+
+.text-center
+{
+    text-align: center;
+}
+
+.border-bold
+{
+    border: 1px solid #2258fb !important;
+    border-collapse: collapse;
+}
+
+.border-bold-left
+{
+    border-left: 1px solid #2258fb !important;
+    border-collapse: collapse;
+}
+
+.border-bold-bottom
+{
+    border-bottom: 1px solid #2258fb !important;
+    border-collapse: collapse;
+}
+
+.border-bold-right
+{
+    border-right: 1px solid #2258fb !important;
+    border-collapse: collapse;
+}
+
+.border-light
+{
+    border: 0.3px solid #2258fb;
+    border-collapse: collapse;
+}
+
+.noPadding{
+    padding : 0px;
+    margin : 0px;
+}
+
+.line
+{
+    margin-top : 30px;
+    margin-bottom : 10px;
+}
+
+.memo
+{
+    color: #9e9e9e;
+    font-weight : 20 !important;
+}
+
+</style>
+
+
+</head>
+<body>
+
+<div id="give">
+    <div class="top">
+        <div class="header">
+            <div class="title blue" style="font-size:28px; font-weight : 800;">거 래 명 세 표</div>
+            <div><span style="color : red;">(고객용)</span></div>
+            <div><span class="blue">거 래 일 자 :</span> {{ yyyymmdd }}</div>
+        </div>
+    </div>
+    <div class="table-sheet">
+        <table>
+            <tr class="border-bold">
+                <th class="blue" rowspan="2" style="width : 35px; padding:2px; line-height:10%">공<br>급<br>자</th>
+                <th class="blue">등록번호</th>
+                <td class="blue" colspan="3">505-81-00799</td>
+                <th class="blue" rowspan="2" style="width : 35px; padding:2px; line-height:10%">피<br>공<br>급<br>자</th>
+                <th class="blue">등록번호</th>
+                {% if location.location_companyNumber %}
+                    <td colspan="3">{{location.location_companyNumber}}</td>
+                {% else %}
+                    <td colspan="3"> </td>
+                {% endif %}
+            </tr>
+            <tr class="border-bold">
+                <th class="blue">성명</th>
+                <td class="blue">정한식</td>
+                <th class="blue">상호</th>
+                <td class="blue" style="padding : 0.1;">(주)케이씨피드</td>
+                <th class="blue">성명</th>
+                {% if location.location_owner %}
+                    <td>{{ location.location_owner|cut:" "}}</td>
+                {% else %}
+                    <td> </td>
+                {% endif %}
+                <th class="blue">상호</th>
+                {% if location.codeName %}
+                    <td style="font-size : 9.5px;">{{ location.codeName|cut:" " }}</td>
+                {% else %}
+                    <td> </td>
+                {% endif %}
+            </tr>
+            <tr class="border-bold">
+                <td class="blue" style="padding : 1px;">주소</td>
+                <td class="blue" colspan="4">경남 거창군 남상면 홍덕길 22</td>
+                <td class="blue" style="padding : 1px;">주소</td>
+                {% if location.location_address %}
+                    <td colspan="4">{{ location.location_address|cut:" " }}</td>
+                {% else %}
+                    <td  colspan="4"> </td>
+                {% endif %}
+            </tr>
+            <tr class="border-bold">
+                <th class="blue" style="width : 35px; padding-top : 3px;">NO</th>
+                <th class="blue" colspan="4" style="padding-top : 3px;">제품명</th>
+                <th class="blue" style="width : 35px; padding-top : 3px;">단위</th>
+                <th class="blue" style="padding-top : 3px;">수량</th>
+                {% if sumData.moneyMark == "true"%}
+                    <th class="blue" style="padding-top : 3px;">단가</th>
+                    <th class="blue" style="padding-top : 3px;">공급가액</th>
+                    <th class="blue" style="padding-top : 3px;">부가세액</th>
+                {% else %}
+                    <th class="blue" colspan="3" style="padding-top : 3px;">메모</th>
+                {% endif %}
+            </tr>
+            {% if sumData.moneyMark == "true"%}
+                {% for i in "xxxxxxxxxxxx" %} <!-- 금액 -->
+                <tr class="border-bold">
+                    <td class="blue text-center border-bold-left" style="width : 35px; ">{{ forloop.counter }}</td>
+                    {% if orders|lookup_specialTag:forloop.counter0 %}
+                    <td colspan="4">
+                        <span style="text-decoration: underline;">({{orders|lookup_specialTag:forloop.counter0}})</span>
+                        {{orders|lookup_codeName:forloop.counter0}}
+                    </td>
+                    {% else %}
+                    <td colspan="4"> {{ orders|lookup_codeName:forloop.counter0 }}</td>
+                    {% endif %}
+                    {% if orders|lookup_codeName:forloop.counter0 == " " %}
+                        <td class="text-center"> </td>
+                    {% else %}
+                        <td class="text-center">EA</td>
+                    {% endif %}
+                    <td class="text-right">{{ orders|lookup_totalCount:forloop.counter0 }}</td>
+                    <td class="text-right">{{ orders|lookup_price:forloop.counter0|intcomma }}</td>
+                    <td class="text-right">{{ orders|lookup_supplyPrice:forloop.counter0|intcomma }}</td>
+                    <td class="text-right">{{ orders|lookup_releaseVat:forloop.counter0|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            {% else %} <!-- 메모 -->
+                {% for i in "xxxxxxxxxxxx" %}
+                <tr class="border-bold">
+                    <td class="blue text-center border-bold-left" style="width : 35px; ">{{ forloop.counter }}</td>
+                    {% if orders|lookup_specialTag:forloop.counter0 %}
+                    <td colspan="4">
+                        <span style="text-decoration: underline;">({{orders|lookup_specialTag:forloop.counter0}})</span>
+                        {{orders|lookup_codeName:forloop.counter0}}
+                    </td>
+                    {% else %}
+                    <td colspan="4"> {{ orders|lookup_codeName:forloop.counter0 }}</td>
+                    {% endif %}
+                    {% if orders|lookup_codeName:forloop.counter0 == " " %}
+                        <td class="text-center"> </td>
+                    {% else %}
+                        <td class="text-center">EA</td>
+                    {% endif %}
+                    <td class="text-right">{{ orders|lookup_totalCount:forloop.counter0 }}</td>
+                    <td colspan="3" class="text-center memo">{{ orders|lookup_memo:forloop.counter0|cut:" " }}</td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+        <table>
+            <tr>
+                <td class="blue text-center border-bold">
+                    <table>
+                        <tr>
+                            <td class="blue text-center border-bold-bottom" style="padding-top:-5px;">합계(EA)</td>
+                        </tr>
+                        <tr>
+                            <td class="blue text-center ">기표자 및 책임자</td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="blue text-center border-bold">
+                    <table>
+                        <tr>
+                            <td class="blue text-center border-bold-bottom" style="padding-top:-5px;">{{sumData.sumTotalCount|intcomma}}</td>
+                        </tr>
+                        <tr>
+                            <td class="blue text-center ">
+                                &nbsp
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="blue text-center" colspan="3">
+                    <br>
+                    <span style="color : red;">책임자 서명이 없으면 무효입니다.</span><br>
+                    <span>당사 제품을 애용해 주셔서 감사합니다.</span>
+                </td>
+                <td class="blue text-center border-bold">
+                    <table>
+                        <tr>
+                            <td class="blue text-center border-bold-bottom">공급가액소계</td>
+                        </tr>
+                        <tr>
+                            <td class="blue text-center border-bold-bottom">부가가치세</td>
+                        </tr>
+                        <tr>
+                            <td class="blue text-center ">합계</td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="blue text-center border-bold">
+                    <table>
+                        <tr>
+                            {% if sumData.moneyMark == "true"%}
+                                <td class="blue text-center border-bold-bottom">{{sumData.sumSupplyPrice|intcomma}}</td>
+                            {% else %}
+                                <td class="blue text-center border-bold-bottom">&nbsp</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            {% if sumData.moneyMark == "true"%}
+                                <td class="blue text-center border-bold-bottom">{{sumData.sumVat|intcomma}}</td>
+                            {% else %}
+                                <td class="blue text-center border-bold-bottom">&nbsp</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            {% if sumData.moneyMark == "true"%}
+                                <td class="blue text-center ">{{sumData.sumTotal|intcomma}}</td>
+                            {% else %}
+                                <td class="blue text-center border-bold-bottom">&nbsp</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="line">
+    ----------------------------------------------------------------------- 절 취 선
+    ----------------------------------------------------------------------------
+</div>
+
+
+<div id="take">
+    <div class="top" style="padding-top : 5px;">
+        <div class="header">
+            <div class="title blue" style="font-size:28px; font-weight : 800; padding-bottom:-10px;">제 품 인 수 증</div>
+            <div><span style="color : red;">(고객용)</span></div>
+            <div class="noPadding">
+                <span class="blue">거 래 일 자 : </span>{{ yyyymmdd }}
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+            </div>
+            <div class="noPadding"><span class="blue">거래처 상호 : </span>{{ location.codeName }}</div>
+            <div class="blue noPadding">도착 요망 일시 :</div>
+            <div class="blue noPadding" style="margin-left : 20px !important">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                아래와 같이 정히 인수함.
+            </div>
+            <div class="blue noPadding">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                인수일 :
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                인수자 :
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                인
+            </div>
+        </div>
+    </div>
+    <div class="table-sheet">
+        <table>
+            <tr class="border-bold">
+                <th class="blue" style="width : 40px; padding-top : 3px;">NO</th>
+                <th class="blue" colspan="4" style="padding-top : 3px;">제품명</th>
+                <th class="blue" style="width : 40px; padding-top : 3px;">단위</th>
+                <th class="blue" style="padding-top : 3px;">수량</th>
+                {% if sumData.moneyMark == "true"%}
+                    <th class="blue" style="padding-top : 3px;">단가</th>
+                    <th class="blue" style="padding-top : 3px;">공급가액</th>
+                    <th class="blue" style="padding-top : 3px;">부가세액</th>
+                {% else %}
+                    <th class="blue" colspan="3" style="padding-top : 3px;">메모</th>
+                {% endif %}
+            </tr>
+            {% if sumData.moneyMark == "true"%}
+                {% for i in "xxxxxxxxxxxx" %} <!-- 금액 -->
+                <tr class="border-bold">
+                    <td class="blue text-center border-bold-left" style="width : 35px; ">{{ forloop.counter }}</td>
+                    {% if orders|lookup_specialTag:forloop.counter0 %}
+                    <td colspan="4">
+                        <span style="text-decoration: underline;">({{orders|lookup_specialTag:forloop.counter0}})</span>
+                        {{orders|lookup_codeName:forloop.counter0}}
+                    </td>
+                    {% else %}
+                    <td colspan="4"> {{ orders|lookup_codeName:forloop.counter0 }}</td>
+                    {% endif %}
+                    {% if orders|lookup_codeName:forloop.counter0 == " " %}
+                        <td class="text-center"> </td>
+                    {% else %}
+                        <td class="text-center">EA</td>
+                    {% endif %}
+                    <td class="text-right">{{ orders|lookup_totalCount:forloop.counter0 }}</td>
+                    <td class="text-right">{{ orders|lookup_price:forloop.counter0|intcomma }}</td>
+                    <td class="text-right">{{ orders|lookup_supplyPrice:forloop.counter0|intcomma }}</td>
+                    <td class="text-right">{{ orders|lookup_releaseVat:forloop.counter0|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            {% else %} <!-- 메모 -->
+                {% for i in "xxxxxxxxxxxx" %}
+                <tr class="border-bold">
+                    <td class="blue text-center border-bold-left" style="width : 35px; ">{{ forloop.counter }}</td>
+                    {% if orders|lookup_specialTag:forloop.counter0 %}
+                    <td colspan="4">
+                        <span style="text-decoration: underline;">({{orders|lookup_specialTag:forloop.counter0}})</span>
+                        {{orders|lookup_codeName:forloop.counter0}}
+                    </td>
+                    {% else %}
+                    <td colspan="4"> {{ orders|lookup_codeName:forloop.counter0 }}</td>
+                    {% endif %}
+                    {% if orders|lookup_codeName:forloop.counter0 == " " %}
+                        <td class="text-center"> </td>
+                    {% else %}
+                        <td class="text-center">EA</td>
+                    {% endif %}
+                    <td class="text-right">{{ orders|lookup_totalCount:forloop.counter0 }}</td>
+                    <td colspan="3" class="text-center memo">{{ orders|lookup_memo:forloop.counter0|cut:" " }}</td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+        <table>
+            <tr>
+                <td class="blue text-center border-bold">합계(EA)
+                    <!--<table>-->
+                    <!--<tr>-->
+                    <!--<td class="blue text-center ">합계(EA)</td>-->
+                    <!--</tr>-->
+                    <!--</table>-->
+                </td>
+                <td class="blue text-center border-bold">{{sumData.sumTotalCount|intcomma}}
+                    <!--<table>-->
+                    <!--<tr>-->
+                    <!--<td  class="blue text-center ">{{sumData.sumTotalCount|intcomma}}</td>-->
+                    <!--</tr>-->
+                    <!--</table>-->
+                </td>
+                <td class="blue text-center" colspan="2">
+                    <br>
+                    <span style="font-size:20px; font-weight : 800;">케이씨피드 귀중</span><br>
+                </td>
+                <td class="blue text-center border-bold">
+                    <table>
+                        <tr>
+                            <td class="blue text-center border-bold-bottom">공급가액소계</td>
+                        </tr>
+                        <tr>
+                            <td class="blue text-center border-bold-bottom">부가가치세</td>
+                        </tr>
+                        <tr>
+                            <td class="blue text-center ">합계</td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="blue text-center border-bold">
+                    <table>
+                        <tr>
+                            {% if sumData.moneyMark == "true"%}
+                                <td class="blue text-center border-bold-bottom">{{sumData.sumSupplyPrice|intcomma}}</td>
+                            {% else %}
+                                <td class="blue text-center border-bold-bottom">&nbsp</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            {% if sumData.moneyMark == "true"%}
+                                <td class="blue text-center border-bold-bottom">{{sumData.sumVat|intcomma}}</td>
+                            {% else %}
+                                <td class="blue text-center border-bold-bottom">&nbsp</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            {% if sumData.moneyMark == "true"%}
+                                <td class="blue text-center ">{{sumData.sumTotal|intcomma}}</td>
+                            {% else %}
+                                <td class="blue text-center border-bold-bottom">&nbsp</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% load widget_tweaks %}
+{% load mathfilters %}
+
+<td data-title="출고구분">{% render_field packingForm.type class="form-control type" %}</td>
+<td data-title="출고일자">
+    {% render_field packingForm.ymd %}
+    {% render_field packingForm.code %}
+    {% render_field packingForm.fakeYmd class="form-control" required="True"%}
+</td>
+<td data-title="수량">{% render_field packingForm.count class="form-control count" required="True" %}</td>
+<td data-title="메모">{% render_field packingForm.memo class="form-control" %}</td>

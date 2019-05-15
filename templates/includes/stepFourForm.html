@@ -1,0 +1,24 @@
+{% load widget_tweaks %}
+{% load mathfilters %}
+
+    {{ stepFourForm.management_form }}
+
+    {% for field in stepFourForm %}
+          <tr class="forms-row">
+            <td class="no" data-title="No">{{ forloop.counter }}</td>
+            <td data-title="제품명">{% render_field field.product style="width : 100%;" class="form-control product"%}</td>
+            <td data-title="양(KG)">{% render_field field.amount class="form-control amount" %}
+                {% render_field field.amount_kg class="amount_kg" %}
+            </td>
+            <td data-title="수량(EA)">{% render_field field.count  class="form-control count" %}</td>
+            <td data-title="메모">
+                <div class="input-group">
+                    {% render_field field.memo class="form-control" %}
+                    <div class="input-group-append">
+                        <button class="btn btn-success add-form-row">+</button>
+                    </div>
+                </div>
+            </td>
+    {% endfor %}
+
+    {{ stepFourForm.media.js }}

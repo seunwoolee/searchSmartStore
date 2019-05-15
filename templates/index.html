@@ -1,0 +1,39 @@
+{% extends 'baseHTML.html' %}
+
+{% load static %}
+
+
+{% block stylesheet %}
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Default form subscription -->
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+
+    <!-- Icon -->
+    <div class="fadeIn first">
+      실시간 검색
+    </div>
+
+    <form>
+      <input type="text" id="login" class="fadeIn second" name="login" placeholder="상호명">
+      <input type="text" id="password" class="fadeIn third" name="login" placeholder="검색어">
+      <input type="submit" class="fadeIn fourth" value="Search">
+    </form>
+
+    <div id="formFooter">
+      <a class="underlineHover" href="#">검색 예약</a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}

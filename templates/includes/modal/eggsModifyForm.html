@@ -1,0 +1,23 @@
+{% load widget_tweaks %}
+{% load mathfilters %}
+
+      <table style="width : 100%">
+          <tr>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>금액</label>
+                        {% render_field eggForm.price class="form-control pirce" id="modify_id_price"%}
+                  </div>
+              </td>
+              <td>
+                  <div class="form-group">
+                      <label><i class="nav-icon icon-drop"></i>수량(EA)</label>
+                        {% render_field eggForm.count class="form-control count" required="True" id="modify_id_count"%}
+                  </div>
+              </td>
+          </tr>
+      </table>
+      <div class="form-group">
+          <label><i class="nav-icon icon-note"></i>메모</label>
+            {% render_field eggForm.memo class="form-control" id="modify_id_memo"%}
+      </div>

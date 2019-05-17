@@ -9,29 +9,48 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+    <div class="container-fluid">
     <!-- Default form subscription -->
-<div class="wrapper fadeInDown">
-  <div id="formContent">
-    <!-- Tabs Titles -->
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+            <!-- Tabs Titles -->
 
-    <!-- Icon -->
-    <div class="fadeIn first">
-      <h4 class="h4">실시간 검색</h4>
+            <!-- Icon -->
+            <div class="fadeIn first">
+                <h4 class="h4">실시간 검색</h4>
+            </div>
+
+            <form method="post" id="start_search_form" action="{% url 'index' %}">
+                {{ form.company_name }}
+                {{ form.keywords }}
+                <input type="submit" class="fadeIn fourth" value="Search">
+            </form>
+
+            <div id="formFooter">
+                <a class="underlineHover" href="#">검색 예약</a>
+            </div>
+
+        </div>
     </div>
 
-    <form method="post" id="start_search_form">
-        {{ form.company_name }}
-        {{ form.keywords }}
-      <input type="submit" class="fadeIn fourth" value="Search">
-    </form>
-
-    <div id="formFooter">
-      <a class="underlineHover" href="#">검색 예약</a>
+    <div>
+        <table class="table" id="ranking_table">
+            <thead>
+            <tr>
+                <th>상호명</th>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>카테고리</th>
+                <th>랭킹</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% include 'partial_ranking_list.html' %}
+            </tbody>
+        </table>
     </div>
 
-  </div>
-</div>
+
 
 {% endblock %}
 

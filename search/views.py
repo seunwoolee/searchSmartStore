@@ -1,4 +1,6 @@
 import django
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 django.setup()
 from django.shortcuts import render
@@ -42,15 +44,21 @@ class MainList(View):
         return render(request, 'index.html', {'form': form})
 
     def post(self, request):
+        data: dict = dict()
         form = SearchForm(request.POST)
         if form.is_valid():
             form.save()
             self.company_name: str = form.cleaned_data['company_name']
             self.keywords: str = form.cleaned_data['keywords']
             self.get_links()
+            data['form_is_valid'] = True
+        else:
+            data['form_is_valid'] = False
 
-        form = SearchForm()
-        return render(request, 'index.html', {'form': form})
+        # logs = Log.objects.all()
+        logs = [{'id': 1, 'company_name': '승우', 'keywords': '짱'}]
+        data['html_ranking_list'] = render_to_string('partial_ranking_list.html', {'logs': logs})
+        return JsonResponse(data)
 
     def get_links(self):
         for i in range(1, 11):
@@ -61,7 +69,7 @@ class MainList(View):
         self.check_items()
         # self.pool.map(self.check_items, htmls)
 
-    def check_items(self):
+    def check_items(self) -> list:
 
         for i, html in enumerate(self.htmls):
             soup = BeautifulSoup(html, 'html.parser')
@@ -69,6 +77,7 @@ class MainList(View):
             product_name: BeautifulSoup = soup.select('ul.goods_list div.info a.tit')
             product_price: BeautifulSoup = soup.select('ul.goods_list div.info span.price em')
             product_advertise: BeautifulSoup = soup.select('ul.goods_list div.info span.price a.ad_stk')
+            product_categorys: BeautifulSoup = soup.select('ul.goods_list div.info span.depth a')
             seller_info: BeautifulSoup = soup.select('ul.goods_list div.info_mall a.mall_img')
 
             for j, seller in enumerate(seller_info):
@@ -82,5 +91,14 @@ class MainList(View):
                     clean_product_advertise: str = ''
 
                 if self.company_name in clean_company_name:
-                    result_title = f'{clean_product_name}{clean_product_advertise}'
-                    print(f'{i+1}페이지 {j+1}위 {result_title} {clean_product_price}')
+                    test = []
+                    for product_category in product_categorys:
+                        test.append(product_category.text.strip())
+                        print(test)
+                        print('####')
+
+                    result_product_name = f'{clean_product_name}{clean_product_advertise}'
+                    result_company_name = self.company_name
+                    result_ranking = f'{i+1}페이지 {j+1}위'
+                    result_price = clean_product_price
+                    print(f'{i+1}페이지 {j+1}위 {result_product_name} {clean_product_price}')

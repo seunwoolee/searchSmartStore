@@ -9,15 +9,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
 from bs4 import BeautifulSoup
-import requests
-import time
-
 from log.models import Log
 from search.forms import SearchForm
 import requests
 
 from multiprocessing import Pool, Process
 
+import telegram
 
 def search_urls(url):  # class안에 넣으면 시리얼 에러남
     req = requests.get(url)
@@ -51,13 +49,12 @@ class MainList(View):
             self.company_name: str = form.cleaned_data['company_name']
             self.keywords: str = form.cleaned_data['keywords']
             self.get_links()
+            self.send_message()
             data['form_is_valid'] = True
         else:
             data['form_is_valid'] = False
 
-        # logs = Log.objects.all()
-        logs = [{'id': 1, 'company_name': '승우', 'keywords': '짱'}]
-        data['html_ranking_list'] = render_to_string('partial_ranking_list.html', {'logs': logs})
+        data['html_ranking_list'] = render_to_string('partial_ranking_list.html', {'results': self.result})
         return JsonResponse(data)
 
     def get_links(self):
@@ -69,11 +66,10 @@ class MainList(View):
         self.check_items()
         # self.pool.map(self.check_items, htmls)
 
-    def check_items(self) -> list:
+    def check_items(self):
 
         for i, html in enumerate(self.htmls):
             soup = BeautifulSoup(html, 'html.parser')
-            # product_info: BeautifulSoup = soup.select('ul.goods_list div.info')
             product_name: BeautifulSoup = soup.select('ul.goods_list div.info a.tit')
             product_price: BeautifulSoup = soup.select('ul.goods_list div.info span.price em')
             product_advertise: BeautifulSoup = soup.select('ul.goods_list div.info span.price a.ad_stk')
@@ -86,19 +82,35 @@ class MainList(View):
                 clean_product_price: str = product_price[j].text.strip()
 
                 try:
-                    clean_product_advertise: str = f'({product_advertise[i].text.strip()})'
+                    clean_product_advertise: str = f'({product_advertise[j].text.strip()})'
                 except:
                     clean_product_advertise: str = ''
 
                 if self.company_name in clean_company_name:
-                    test = []
-                    for product_category in product_categorys:
-                        test.append(product_category.text.strip())
-                        print(test)
-                        print('####')
+                    product_category: BeautifulSoup = product_categorys[-1]
+                    result_product_category: str = f'{product_category.get("title")} > {product_category.text}'
+                    result_product_name: str = f'{clean_product_name}{clean_product_advertise}'
+                    result_company_name: str = self.company_name
+                    result_ranking: str = f'{i+1}페이지 {j+1}위'
+                    result_price: str = clean_product_price
 
-                    result_product_name = f'{clean_product_name}{clean_product_advertise}'
-                    result_company_name = self.company_name
-                    result_ranking = f'{i+1}페이지 {j+1}위'
-                    result_price = clean_product_price
-                    print(f'{i+1}페이지 {j+1}위 {result_product_name} {clean_product_price}')
+                    d = dict(result_product_category=result_product_category,
+                             result_product_name=result_product_name,
+                             result_company_name=result_company_name,
+                             result_ranking=result_ranking,
+                             result_price=result_price)
+
+                    self.result.append(d)
+                    print(f'{i+1}페이지 {j+1}위 {result_product_name} {clean_product_price} {result_product_category}')
+
+    def send_message(self):
+        bot: telegram = telegram.Bot(token='865080373:AAFuVoSdoIrrWHxpe0ny9_LumSUrrbrS_S8')
+        chat_id = bot.getUpdates()[-1].message.chat.id
+
+        for result in self.result:
+            # print(f'키워드: {self.keywords} {result["result_ranking"]} {result["result_product_name"]}'
+            #       f'{result["result_price"]} {result["result_product_category"]}')
+            text = f'키워드: {self.keywords} ' \
+                   f'정보: {result["result_ranking"]} {result["result_product_name"]} ' \
+                   f'{result["result_price"]} {result["result_product_category"]}'
+            bot.sendMessage(chat_id=chat_id, text=text)

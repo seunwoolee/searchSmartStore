@@ -17,6 +17,8 @@ from multiprocessing import Pool, Process
 
 import telegram
 
+TOKEN = '865080373:AAFuVoSdoIrrWHxpe0ny9_LumSUrrbrS_S8'
+
 def search_urls(url):  # class안에 넣으면 시리얼 에러남
     req = requests.get(url)
     html = req.text
@@ -28,9 +30,9 @@ class MainList(View):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.company_name: str = ''
-        self.keywords: str = ''
-        self.naver_shopping_url: str = ''
+        self.company_name: str
+        self.keywords: str
+        self.naver_shopping_url: str
         self.urls: list = []
         self.result: list = []
         self.pool: Pool = Pool(processes=4)
@@ -45,9 +47,12 @@ class MainList(View):
         data: dict = dict()
         form = SearchForm(request.POST)
         if form.is_valid():
-            form.save()
             self.company_name: str = form.cleaned_data['company_name']
             self.keywords: str = form.cleaned_data['keywords']
+
+            if not Log.objects.filter(company_name=self.company_name).filter(keywords=self.keywords):
+                form.save()
+
             self.get_links()
             self.send_message()
             data['form_is_valid'] = True
@@ -104,13 +109,14 @@ class MainList(View):
                     print(f'{i+1}페이지 {j+1}위 {result_product_name} {clean_product_price} {result_product_category}')
 
     def send_message(self):
-        bot: telegram = telegram.Bot(token='865080373:AAFuVoSdoIrrWHxpe0ny9_LumSUrrbrS_S8')
-        chat_id = bot.getUpdates()[-1].message.chat.id
+        global TOKEN
+        bot: telegram = telegram.Bot(token=TOKEN)
+        chat_id = '826706369'
 
         for result in self.result:
-            # print(f'키워드: {self.keywords} {result["result_ranking"]} {result["result_product_name"]}'
-            #       f'{result["result_price"]} {result["result_product_category"]}')
-            text = f'키워드: {self.keywords} ' \
-                   f'정보: {result["result_ranking"]} {result["result_product_name"]} ' \
-                   f'{result["result_price"]} {result["result_product_category"]}'
+            text = f'키워드: {self.keywords} \n' \
+                   f'순위: {result["result_ranking"]} \n' \
+                   f'상품명: {result["result_product_name"]}\n' \
+                   f'가격: {result["result_price"]} \n' \
+                   f'카테고리: {result["result_product_category"]}'
             bot.sendMessage(chat_id=chat_id, text=text)

@@ -74,7 +74,6 @@ class MainList(View):
             self.urls.append(self.naver_shopping_url)
         self.htmls: list = self.pool.map(self.search_urls, self.urls)
 
-
     def check_items(self):
         for i, html in enumerate(self.htmls):
             soup = BeautifulSoup(html, 'html.parser')
@@ -119,14 +118,15 @@ class MainList(View):
     def create_item(self, dict):
         product_code: ProductCode = ProductCode.objects.filter(company_name=self.company_name) \
             .filter(product_name=self.product_name).first()
-
+        item: Items = Items.objects.filter(product_code=product_code).filter(result_product_log=self.log).first()
         if not product_code:  # 처음으로 검색했을때
             product_code = ProductCode(company_name=self.company_name, product_name=self.product_name)
             dict['product_code'] = product_code
             product_code.save()
             Items(**dict).save()
+        elif not item: # 등록된 상품은있는데 해당 키워드로 처음 검색했을때
+            Items(**dict).save() # 상품과 키워드 매칭
         else:  # 기존에 item이 있으면 랭킹 Insert
-            item: Items = Items.objects.get(product_code=product_code)
             rank_item:RankItem = RankItem.objects.filter(item=item).last()
 
             if rank_item:

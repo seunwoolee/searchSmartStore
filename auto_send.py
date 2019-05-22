@@ -18,5 +18,6 @@ if __name__ == '__main__':
 
     for log in logs:
         main = MainList(keywords=log.keywords, company_name=log.company_name)
+        main.log = log
         main.get_links()
-        main.send_message()
+        main.check_items()

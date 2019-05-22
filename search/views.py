@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
 from bs4 import BeautifulSoup
-from log.models import Log
+from log.models import Log, Items, ProductCode, RankItem
 from search.forms import SearchForm
 import requests
 
@@ -18,6 +18,7 @@ from multiprocessing import Pool, Process
 import telegram
 
 TOKEN = '865080373:AAFuVoSdoIrrWHxpe0ny9_LumSUrrbrS_S8'
+
 
 def search_urls(url):  # class안에 넣으면 시리얼 에러남
     req = requests.get(url)
@@ -32,12 +33,14 @@ class MainList(View):
         super().__init__(**kwargs)
         self.company_name: str
         self.keywords: str
+        self.product_name: str
         self.naver_shopping_url: str
         self.urls: list = []
         self.result: list = []
         self.pool: Pool = Pool(processes=4)
         self.search_urls = search_urls
         self.htmls: list = []
+        self.log: Log
 
     def get(self, request):
         form = SearchForm()
@@ -49,12 +52,14 @@ class MainList(View):
         if form.is_valid():
             self.company_name: str = form.cleaned_data['company_name']
             self.keywords: str = form.cleaned_data['keywords']
+            self.log = Log.objects.filter(company_name=self.company_name).filter(keywords=self.keywords).first()
 
-            if not Log.objects.filter(company_name=self.company_name).filter(keywords=self.keywords):
+            if not self.log:
                 form.save()
 
             self.get_links()
-            self.send_message()
+            self.check_items()
+
             data['form_is_valid'] = True
         else:
             data['form_is_valid'] = False
@@ -68,11 +73,9 @@ class MainList(View):
                 f'&pagingSize=40&viewType=list&sort=rel&frm=NVSHPAG&query={self.keywords}'
             self.urls.append(self.naver_shopping_url)
         self.htmls: list = self.pool.map(self.search_urls, self.urls)
-        self.check_items()
-        # self.pool.map(self.check_items, htmls)
+
 
     def check_items(self):
-
         for i, html in enumerate(self.htmls):
             soup = BeautifulSoup(html, 'html.parser')
             product_name: BeautifulSoup = soup.select('ul.goods_list div.info a.tit')
@@ -95,28 +98,68 @@ class MainList(View):
                     product_category: BeautifulSoup = product_categorys[-1]
                     result_product_category: str = f'{product_category.get("title")} > {product_category.text}'
                     result_product_name: str = f'{clean_product_name}{clean_product_advertise}'
-                    result_company_name: str = self.company_name
-                    result_ranking: str = f'{i+1}페이지 {j+1}위'
-                    result_price: str = clean_product_price
+                    self.product_name = result_product_name
+                    result_product_ranking: str = f'{i + 1}페이지 {j + 1}위'
+                    result_product_ranking_number: int = (i + 1) * 10 + j
+                    result_product_price: str = clean_product_price
 
-                    d = dict(result_product_category=result_product_category,
-                             result_product_name=result_product_name,
-                             result_company_name=result_company_name,
-                             result_ranking=result_ranking,
-                             result_price=result_price)
+                    result: dict = dict(result_product_name=result_product_name,
+                                        result_product_price=result_product_price,
+                                        result_product_category=result_product_category,
+                                        result_product_ranking=result_product_ranking,
+                                        result_product_ranking_number=result_product_ranking_number,
+                                        result_product_log=self.log)
 
-                    self.result.append(d)
-                    print(f'{i+1}페이지 {j+1}위 {result_product_name} {clean_product_price} {result_product_category}')
+                    self.create_item(result)
 
-    def send_message(self):
+                    result['result_company_name'] = self.company_name
+                    self.result.append(result)
+                    print(f'{i + 1}페이지 {j + 1}위 {result_product_name} {result_product_price} {result_product_category}')
+
+    def create_item(self, dict):
+        product_code: ProductCode = ProductCode.objects.filter(company_name=self.company_name) \
+            .filter(product_name=self.product_name).first()
+
+        if not product_code:  # 처음으로 검색했을때
+            product_code = ProductCode(company_name=self.company_name, product_name=self.product_name)
+            dict['product_code'] = product_code
+            product_code.save()
+            Items(**dict).save()
+        else:  # 기존에 item이 있으면 랭킹 Insert
+            item: Items = Items.objects.get(product_code=product_code)
+            rank_item:RankItem = RankItem.objects.filter(item=item).last()
+
+            if rank_item:
+                origin_ranking: int = rank_item.ranking_number
+            else:
+                origin_ranking: int = item.result_product_ranking_number
+
+            ranking_diff = origin_ranking - dict['result_product_ranking_number']
+
+            if ranking_diff != 0:
+                rankitem = RankItem(item=item,
+                                    ranking=dict['result_product_ranking'],
+                                    ranking_number=dict['result_product_ranking_number'],
+                                    ranking_diff=ranking_diff)
+                rankitem.save()
+                print(rankitem.__str__())
+                self.send_message(rankitem.__str__())
+
+    def send_message(self, text):
+        global TOKEN
+        bot: telegram = telegram.Bot(token=TOKEN)
+        chat_id = '826706369'
+        bot.sendMessage(chat_id=chat_id, text=text)
+
+    def auto_send_message(self):
         global TOKEN
         bot: telegram = telegram.Bot(token=TOKEN)
         chat_id = '826706369'
 
-        for result in self.result:
-            text = f'키워드: {self.keywords} \n' \
-                   f'순위: {result["result_ranking"]} \n' \
-                   f'상품명: {result["result_product_name"]}\n' \
-                   f'가격: {result["result_price"]} \n' \
-                   f'카테고리: {result["result_product_category"]}'
-            bot.sendMessage(chat_id=chat_id, text=text)
+        # for result in self.result:
+        #     text = f'키워드: {self.keywords} \n' \
+        #            f'순위: {result["result_product_ranking"]} \n' \
+        #            f'상품명: {result["result_product_name"]}\n' \
+        #            f'가격: {result["result_product_price"]} \n' \
+        #            f'카테고리: {result["result_product_category"]}'
+        #     bot.sendMessage(chat_id=chat_id, text=text)

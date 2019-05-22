@@ -125,6 +125,7 @@ class MainList(View):
             product_code.save()
             Items(**dict).save()
         elif not item: # 등록된 상품은있는데 해당 키워드로 처음 검색했을때
+            dict['product_code'] = product_code
             Items(**dict).save() # 상품과 키워드 매칭
         else:  # 기존에 item이 있으면 랭킹 Insert
             rank_item:RankItem = RankItem.objects.filter(item=item).last()

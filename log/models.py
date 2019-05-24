@@ -59,6 +59,6 @@ class RankItem(TimeStampedModel):
 
     def __str__(self):
         if self.ranking_diff < 0:
-            return f'{self.ranking_diff} 순위하락 (-_-) 상품명 : {self.item.result_product_name} 현재순위: {self.ranking}'
+            return f'{self.ranking_diff} 순위하락 (-_-) 키워드: {self.item.result_product_log.keywords} 상품명 : {self.item.result_product_name} 현재순위: {self.ranking} '
         else:
-            return f'{self.ranking_diff} 순위상승 (^_^) 상품명 : {self.item.result_product_name} 현재순위: {self.ranking}'
+            return f'{self.ranking_diff} 순위상승 (^_^) 키워드: {self.item.result_product_log.keywords} 상품명 : {self.item.result_product_name} 현재순위: {self.ranking}'

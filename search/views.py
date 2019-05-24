@@ -113,7 +113,7 @@ class MainList(View):
 
                     result['result_company_name'] = self.company_name
                     self.result.append(result)
-                    print(f'{i + 1}페이지 {j + 1}위 {result_product_name} {result_product_price} {result_product_category}')
+                    print(f'키워드: {self.keywords} {i + 1}페이지 {j + 1}위 {result_product_name} {result_product_price} ')
 
     def create_item(self, dict):
         product_code: ProductCode = ProductCode.objects.filter(company_name=self.company_name) \
@@ -151,16 +151,3 @@ class MainList(View):
         bot: telegram = telegram.Bot(token=TOKEN)
         chat_id = '826706369'
         bot.sendMessage(chat_id=chat_id, text=text)
-
-    def auto_send_message(self):
-        global TOKEN
-        bot: telegram = telegram.Bot(token=TOKEN)
-        chat_id = '826706369'
-
-        # for result in self.result:
-        #     text = f'키워드: {self.keywords} \n' \
-        #            f'순위: {result["result_product_ranking"]} \n' \
-        #            f'상품명: {result["result_product_name"]}\n' \
-        #            f'가격: {result["result_product_price"]} \n' \
-        #            f'카테고리: {result["result_product_category"]}'
-        #     bot.sendMessage(chat_id=chat_id, text=text)

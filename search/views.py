@@ -99,7 +99,7 @@ class MainList(View):
                     result_product_name: str = f'{clean_product_name}{clean_product_advertise}'
                     self.product_name = result_product_name
                     result_product_ranking: str = f'{i + 1}페이지 {j + 1}위'
-                    result_product_ranking_number: int = (i + 1) * 10 + j
+                    result_product_ranking_number: int = i * 40 + j
                     result_product_price: str = clean_product_price
 
                     result: dict = dict(result_product_name=result_product_name,
@@ -119,19 +119,19 @@ class MainList(View):
         product_code: ProductCode = ProductCode.objects.filter(company_name=self.company_name) \
             .filter(product_name=self.product_name).first()
         item: Items = Items.objects.filter(product_code=product_code).filter(result_product_log=self.log).first()
-        if not product_code:  # 처음으로 검색했을때
+        if not product_code:
             product_code = ProductCode(company_name=self.company_name, product_name=self.product_name)
             dict['product_code'] = product_code
             product_code.save()
             Items(**dict).save()
-        elif not item: # 등록된 상품은있는데 해당 키워드로 처음 검색했을때
+        elif not item:
             dict['product_code'] = product_code
-            Items(**dict).save() # 상품과 키워드 매칭
+            Items(**dict).save()
         else:  # 기존에 item이 있으면 랭킹 Insert
-            rank_item:RankItem = RankItem.objects.filter(item=item).last()
+            last_rank_item:RankItem = RankItem.objects.filter(item=item).last()
 
-            if rank_item:
-                origin_ranking: int = rank_item.ranking_number
+            if last_rank_item:
+                origin_ranking: int = last_rank_item.ranking_number
             else:
                 origin_ranking: int = item.result_product_ranking_number
 
@@ -143,11 +143,25 @@ class MainList(View):
                                     ranking_number=dict['result_product_ranking_number'],
                                     ranking_diff=ranking_diff)
                 rankitem.save()
-                print(rankitem.__str__())
-                self.send_message(rankitem.__str__())
+
+                if last_rank_item:
+                    message = f' {last_rank_item.__str__()} (순위: {last_rank_item.ranking}-> {rankitem.ranking} {ranking_diff}) '
+                else:
+                    message = f' {item.__str__()} (순위: {item.result_product_ranking}-> {rankitem.ranking} {ranking_diff}) '
+
+                if '광고' in item.result_product_name and item.result_product_ranking_number < 60:
+                    self.send_message(message)
 
     def send_message(self, text):
         global TOKEN
         bot: telegram = telegram.Bot(token=TOKEN)
         chat_id = '826706369'
         bot.sendMessage(chat_id=chat_id, text=text)
+
+
+class Detail(View):
+
+    def get(self, request):
+        product_codes = ProductCode.objects.all()
+        return render(request, 'detail.html', {'product_codes': product_codes})
+

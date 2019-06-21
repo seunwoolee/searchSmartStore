@@ -1,0 +1,9 @@
+{% for product_code in product_codes %}
+<tr>
+    <td data-id="{{ product_code.id}}">{{ product_code.product_name}}</td>
+</tr>
+{% empty %}
+<tr>
+    <td class="text-center bg-warning">No book</td>
+</tr>
+{% endfor %}

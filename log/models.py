@@ -40,7 +40,7 @@ class Items(TimeStampedModel):
     result_product_log = models.ForeignKey('Log', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f'상품명: {self.result_product_name} 순위: {self.result_product_ranking}'
+        return f'상품명: {self.result_product_name} 키워드: {self.result_product_log}'
 
 
 class ProductCode(TimeStampedModel):
@@ -58,7 +58,8 @@ class RankItem(TimeStampedModel):
     ranking_diff = models.IntegerField(default=0)
 
     def __str__(self):
-        if self.ranking_diff < 0:
-            return f'{self.ranking_diff} 순위하락 (-_-) 키워드: {self.item.result_product_log.keywords} 상품명 : {self.item.result_product_name} 현재순위: {self.ranking} '
-        else:
-            return f'{self.ranking_diff} 순위상승 (^_^) 키워드: {self.item.result_product_log.keywords} 상품명 : {self.item.result_product_name} 현재순위: {self.ranking}'
+        return f'{self.item}'
+        # if self.ranking_diff < 0:
+        #     return f' 키워드: {self.item.result_product_log.keywords} 정보: {self.item.__str__} 현재순위: {self.ranking} '
+        # else:
+        #     return f'{self.ranking_diff} 순위상승 (^_^) 키워드: {self.item.result_product_log.keywords} 상품명 : {self.item.result_product_name} 현재순위: {self.ranking}'

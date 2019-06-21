@@ -1,0 +1,77 @@
+{% extends 'baseHTML.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block stylesheet %}
+<link href="{% static 'css/index.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding:5px;">
+    <!-- Default form subscription -->
+    <!--    <div class="wrapper fadeInDown">-->
+    <!--        <div id="formContent">-->
+    <!--            &lt;!&ndash; Tabs Titles &ndash;&gt;-->
+
+    <!--            &lt;!&ndash; Icon &ndash;&gt;-->
+    <!--            <div class="fadeIn first">-->
+    <!--                <h4 class="h4"><br/></h4>-->
+    <!--            </div>-->
+
+    <!--            <form method="post" id="start_search_form" action="{% url 'index' %}">-->
+    <!--                {{ form.company_name }}-->
+    <!--                {{ form.keywords }}-->
+    <!--                <input type="submit" class="fadeIn fourth" value="Search">-->
+    <!--            </form>-->
+
+    <!--            <div id="formFooter">-->
+    <!--                <a class="underlineHover" href="#">검색 예약</a>-->
+    <!--            </div>-->
+
+    <!--        </div>-->
+    <!--    </div>-->
+    <div class="row ">
+        <div class="col col-lg-4">
+            <div class="card">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>제품명</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% include 'partial_item_list.html' %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col col-lg-8" id="graph">
+        </div>
+    </div>
+
+    <!--    <div class="wrapperLeft">-->
+    <!--        <div id="formContent">-->
+    <!--            <table class="table" id="ranking_table">-->
+    <!--                <thead>-->
+    <!--                <tr>-->
+    <!--                    <th>제품명</th>-->
+    <!--                </tr>-->
+    <!--                </thead>-->
+    <!--                <tbody>-->
+    <!--                {% include 'partial_item_list.html' %}-->
+    <!--                </tbody>-->
+    <!--            </table>-->
+    <!--        </div>-->
+
+
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="{% static 'js/detail.js' %}"></script>
+{% endblock %}

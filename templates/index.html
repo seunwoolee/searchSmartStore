@@ -17,7 +17,7 @@
 
             <!-- Icon -->
             <div class="fadeIn first">
-                <h4 class="h4">실시간 검색</h4>
+                <h4 class="h4"><br/></h4>
             </div>
 
             <form method="post" id="start_search_form" action="{% url 'index' %}">
@@ -33,7 +33,9 @@
         </div>
     </div>
 
-    <div>
+
+    <div class="wrapper">
+        <div class="formContentMaxWidthFull">
         <table class="table" id="ranking_table">
             <thead>
             <tr>
@@ -45,10 +47,27 @@
             </tr>
             </thead>
             <tbody>
-                {% include 'partial_ranking_list.html' %}
             </tbody>
         </table>
+
+        </div>
     </div>
+
+<!--    <div>-->
+<!--        <table class="table" id="ranking_table">-->
+<!--            <thead>-->
+<!--            <tr>-->
+<!--                <th>상호명</th>-->
+<!--                <th>상품명</th>-->
+<!--                <th>가격</th>-->
+<!--                <th>카테고리</th>-->
+<!--                <th>랭킹</th>-->
+<!--            </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--    </div>-->
 
 
 

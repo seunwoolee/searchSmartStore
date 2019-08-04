@@ -70,7 +70,7 @@ class MainList(View):
     def get_links(self):
         for i in range(1, 11):
             self.naver_shopping_url = f'https://search.shopping.naver.com/search/all.nhn?origQuery={self.keywords}&pagingIndex={i}' \
-                f'&pagingSize=40&viewType=list&sort=rel&frm=NVSHPAG&query={self.keywords}'
+                                      f'&pagingSize=40&viewType=list&sort=rel&frm=NVSHPAG&query={self.keywords}'
             self.urls.append(self.naver_shopping_url)
         self.htmls: list = self.pool.map(self.search_urls, self.urls)
 
@@ -128,7 +128,7 @@ class MainList(View):
             dict['product_code'] = product_code
             Items(**dict).save()
         else:  # 기존에 item이 있으면 랭킹 Insert
-            last_rank_item:RankItem = RankItem.objects.filter(item=item).last()
+            last_rank_item: RankItem = RankItem.objects.filter(item=item).last()
 
             if last_rank_item:
                 origin_ranking: int = last_rank_item.ranking_number
@@ -164,4 +164,3 @@ class Detail(View):
     def get(self, request):
         product_codes = ProductCode.objects.all()
         return render(request, 'detail.html', {'product_codes': product_codes})
-

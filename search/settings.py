@@ -39,11 +39,22 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'crispy_forms',
+    'pwa',
+    'django_jenkins',
 
     # local
     'log',
 
 ]
+
+PROJECT_APPS = (
+    'MyApp'
+)
+
+JENKINS_TASKS = (
+    'django_jenkins.tasks.run_pep8',
+    'django_jenkins.tasks.run_pyflakes'
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class TimeStampedModel(models.Model):
@@ -6,7 +7,7 @@ class TimeStampedModel(models.Model):
     created , modified filed를 제공해주는 abstract base class model
     """
 
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:

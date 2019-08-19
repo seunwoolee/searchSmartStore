@@ -70,18 +70,18 @@ class MainList(View):
     def get_links(self):
         for i in range(1, 11):
             self.naver_shopping_url = f'https://search.shopping.naver.com/search/all.nhn?origQuery={self.keywords}&pagingIndex={i}' \
-                                      f'&pagingSize=40&viewType=list&sort=rel&frm=NVSHPAG&query={self.keywords}'
+                f'&pagingSize=40&viewType=list&sort=rel&frm=NVSHPAG&query={self.keywords}'
             self.urls.append(self.naver_shopping_url)
         self.htmls: list = self.pool.map(self.search_urls, self.urls)
 
     def check_items(self):
         for i, html in enumerate(self.htmls):
             soup = BeautifulSoup(html, 'html.parser')
-            product_name: BeautifulSoup = soup.select('ul.goods_list div.info a.tit')
-            product_price: BeautifulSoup = soup.select('ul.goods_list div.info span.price em')
-            product_advertise: BeautifulSoup = soup.select('ul.goods_list div.info span.price a.ad_stk')
-            product_categorys: BeautifulSoup = soup.select('ul.goods_list div.info span.depth a')
-            seller_info: BeautifulSoup = soup.select('ul.goods_list div.info_mall a.mall_img')
+            product_name: list = soup.select('ul.goods_list div.info a.tit')
+            product_price: list = soup.select('ul.goods_list div.info span.price em')
+            product_advertise: list = soup.select('ul.goods_list div.info span.price a.ad_stk')
+            product_categorys: list = soup.select('ul.goods_list div.info span.depth a')
+            seller_info: list = soup.select('ul.goods_list div.info_mall a.mall_img')
 
             for j, seller in enumerate(seller_info):
                 clean_company_name: str = seller_info[j].text
@@ -93,7 +93,13 @@ class MainList(View):
                 except:
                     clean_product_advertise: str = ''
 
-                if self.company_name in clean_company_name:
+                if clean_company_name == '쇼핑몰별 최저가':
+                    cheap_seller_list: list = soup.select('ul.goods_list li:nth-child('+str(j+1)+') div.info_mall ul.mall_list')
+                    clean_cheap_seller_list: str = cheap_seller_list[0].text.strip()
+                else:
+                    clean_cheap_seller_list: str = ''
+
+                if self.company_name in clean_company_name or self.company_name in clean_cheap_seller_list:
                     product_category: BeautifulSoup = product_categorys[-1]
                     result_product_category: str = f'{product_category.get("title")} > {product_category.text}'
                     result_product_name: str = f'{clean_product_name}{clean_product_advertise}'
